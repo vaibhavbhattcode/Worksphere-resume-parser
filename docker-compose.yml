@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  resume-parser:
+    build: .
+    container_name: resume-parser-service
+    ports:
+      - "${PORT:-5001}:5001"
+    environment:
+      - FLASK_ENV=production
+      - PORT=5001
+      - HOST=0.0.0.0
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      - BACKEND_URL=${BACKEND_URL:-http://localhost:5000}
+      - ENABLE_CACHE=true
+      - CACHE_MAX_SIZE=100
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./temp:/app/temp
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
